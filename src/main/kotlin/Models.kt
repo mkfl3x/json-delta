@@ -32,3 +32,8 @@ enum class MismatchType {
     VALUE_TYPE_MISMATCH,
     VALUE_MISMATCH
 }
+
+enum class Feature {
+    IGNORE_EXTRA_FIELDS,
+    CHECK_FIELDS_PRESENCE_ONLY
+}

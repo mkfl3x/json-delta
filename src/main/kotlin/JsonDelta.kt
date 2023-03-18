@@ -9,6 +9,12 @@ import com.google.gson.*
 
 class JsonDelta {
 
+    private val features = mutableListOf<Feature>()
+
+    fun featureOn(feature: Feature) = apply { features.add(feature) }
+
+    fun featureOff(feature: Feature) = apply { features.remove(feature) }
+
     fun compare(expected: String, actual: String, vararg ignoredFields: String): ComparisonReport =
         DeltaContext(ignoredFields.asList()).apply {
             if (!checkJsonSyntax(expected, "expected", this) || !checkJsonSyntax(actual, "actual", this))
@@ -43,14 +49,17 @@ class JsonDelta {
             report.addMismatch(fieldName, this)
             return
         }
-        checkExtraFields(expected, actual)?.apply {
-            report.addMismatch(fieldName, this)
-            return
-        }
+        if (!features.contains(Feature.IGNORE_EXTRA_FIELDS))
+            checkExtraFields(expected, actual)?.apply {
+                report.addMismatch(fieldName, this)
+                return
+            }
         expected.asMap().forEach { comparisonResolver(it.value, actual.get(it.key), "$fieldName.${it.key}", report) }
     }
 
     private fun compareFields(expected: JsonPrimitive, actual: JsonPrimitive, fieldName: String, report: DeltaContext) {
+        if (features.contains(Feature.CHECK_FIELDS_PRESENCE_ONLY))
+            return
         report.addMismatch(fieldName, checkFieldType(expected, actual))
         report.addMismatch(fieldName, checkFieldValue(expected, actual))
     }
