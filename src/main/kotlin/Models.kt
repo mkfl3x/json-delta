@@ -1,15 +1,14 @@
 abstract class Mismatch(open val type: MismatchType)
 
-data class FatalMismatch(override val type: MismatchType) : Mismatch(type)
+data class StructureMismatch(override val type: MismatchType, val message: String) : Mismatch(type)
 
 data class ObjectMismatch(override val type: MismatchType, val fields: String) : Mismatch(type)
 
 data class ValueMismatch(override val type: MismatchType, val expected: String, val actual: String) : Mismatch(type)
 
-class DeltaReport(val ignoredFields: List<String>) {
+data class ComparisonReport(val success: Boolean, val mismatches: Map<String, MutableList<Mismatch>>)
 
-    val success: Boolean
-        get() = mismatches.isEmpty()
+class DeltaContext(val ignoredFields: List<String>) {
 
     private val mismatches = mutableMapOf<String, MutableList<Mismatch>>()
 
@@ -20,14 +19,16 @@ class DeltaReport(val ignoredFields: List<String>) {
             mismatches[field]!!.add(mismatch)
         }
     }
+
+    fun getReport() = ComparisonReport(mismatches.isEmpty(), mismatches)
 }
 
 enum class MismatchType {
     NOT_VALID_JSON,
-    OBJECT_TYPE_MISMATCH,
+    OBJECT_TYPES_MISMATCH,
+    OBJECT_MISSED_FIELDS,
+    OBJECT_EXTRA_FIELDS,
+    ARRAY_SIZE_MISMATCH,
     VALUE_TYPE_MISMATCH,
-    VALUE_MISMATCH,
-    MISSED_FIELDS,
-    EXTRA_FIELDS,
-    ARRAY_SIZE_MISMATCH
+    VALUE_MISMATCH
 }
