@@ -2,7 +2,7 @@ abstract class Mismatch(open val type: MismatchType)
 
 data class FatalMismatch(override val type: MismatchType) : Mismatch(type)
 
-data class ObjectMismatch(override val type: MismatchType, val field: String) : Mismatch(type)
+data class ObjectMismatch(override val type: MismatchType, val fields: String) : Mismatch(type)
 
 data class ValueMismatch(override val type: MismatchType, val expected: String, val actual: String) : Mismatch(type)
 
@@ -13,7 +13,7 @@ enum class MismatchType {
     OBJECT_TYPE_MISMATCH,
     VALUE_TYPE_MISMATCH,
     VALUE_MISMATCH,
-    MISSED_FIELD,
-    EXTRA_FIELD,
+    MISSED_FIELDS,
+    EXTRA_FIELDS,
     ARRAY_SIZE_MISMATCH
 }
