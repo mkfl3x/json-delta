@@ -5,7 +5,7 @@ object Checks {
     fun checkJsonSyntax(json: String, name: String, report: DeltaContext) = try {
         JsonParser.parseString(json) is JsonElement
     } catch (e: JsonSyntaxException) {
-        report.addMismatch("root", StructureMismatch(MismatchType.NOT_VALID_JSON, "$name json has wrong structure"))
+        report.addMismatch("root", StructureMismatch(MismatchType.NOT_VALID_JSON))
         false
     }
 
