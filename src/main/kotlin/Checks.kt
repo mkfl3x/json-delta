@@ -3,7 +3,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
-object Checker {
+object Checks {
 
     // TODO: refactor it
     fun checkTypes(expected: JsonElement, actual: JsonElement) = when {

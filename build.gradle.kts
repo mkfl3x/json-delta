@@ -5,8 +5,8 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
+group = "org.json-delta"
+version = "0.1-beta"
 
 repositories {
     mavenCentral()
