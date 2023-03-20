@@ -9,8 +9,8 @@ data class ValueMismatch(override val type: MismatchType, val expected: String, 
 data class ComparisonReport(val success: Boolean, val mismatches: Map<String, MutableList<Mismatch>>) {
 
     override fun toString() = """
-Status: $success
-Mismatches:
+Status: ${if (success) "success" else "failed"}
+${if (mismatches.isNotEmpty()) "Mismatches:" else ""}
 ${mismatches.map { m -> " Field \"${m.key}\"\n    - ${m.value.joinToString("\n    - ") { printMismatch(it) }}" }.joinToString("\n")}
     """.trimIndent()
 
