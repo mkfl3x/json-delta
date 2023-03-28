@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm") version "1.7.21"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
@@ -8,7 +6,7 @@ plugins {
 }
 
 group = "io.github.mkfl3x"
-version = "0.1-beta"
+version = "0.2-beta"
 
 repositories {
     mavenCentral()
@@ -16,7 +14,7 @@ repositories {
 
 dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
-    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
 }
 
 java {
@@ -73,15 +71,7 @@ signing {
 }
 
 tasks.jar {
-    manifest.attributes["Main-Class"] = "JsonDelta"
-    from(configurations.runtimeClasspath.get().map(::zipTree))
+    manifest.attributes["Main-Class"] = "org.mkfl3x.jsondelta.JsonDelta"
+    from(configurations.compileClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
 }
