@@ -8,7 +8,7 @@ data class ObjectMismatch(override val type: MismatchType, val fields: String) :
 
 data class ValueMismatch(override val type: MismatchType, val expected: String, val actual: String) : Mismatch(type)
 
-data class ComparisonReport(val success: Boolean, val mismatches: Map<String, MutableList<Mismatch>>) {
+data class JsonDeltaReport(val success: Boolean, val mismatches: Map<String, MutableList<Mismatch>>) {
 
     override fun toString() = """
 Status: ${if (success) "success" else "failed"}
@@ -36,7 +36,7 @@ class DeltaContext(val ignoredFields: List<String>) {
         }
     }
 
-    fun getReport() = ComparisonReport(mismatches.isEmpty(), mismatches)
+    fun getReport() = JsonDeltaReport(mismatches.isEmpty(), mismatches)
 }
 
 enum class MismatchType(val description: String) {

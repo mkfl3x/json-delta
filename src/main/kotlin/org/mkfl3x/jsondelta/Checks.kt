@@ -4,10 +4,10 @@ import com.google.gson.*
 
 object Checks {
 
-    fun checkJsonSyntax(json: String, name: String, report: DeltaContext) = try {
+    fun checkJsonSyntax(json: String, name: String, context: DeltaContext) = try {
         JsonParser.parseString(json) is JsonElement
     } catch (e: JsonSyntaxException) {
-        report.addMismatch("root", StructureMismatch(MismatchType.NOT_VALID_JSON))
+        context.addMismatch("root", StructureMismatch(MismatchType.NOT_VALID_JSON))
         false
     }
 
