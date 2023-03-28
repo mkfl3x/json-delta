@@ -1,11 +1,13 @@
-import Checks.checkArraySizes
-import Checks.checkExtraFields
-import Checks.checkFieldType
-import Checks.checkFieldValue
-import Checks.checkJsonSyntax
-import Checks.checkMissedFields
-import Checks.checkTypes
+package org.mkfl3x.jsondelta
+
 import com.google.gson.*
+import org.mkfl3x.jsondelta.Checks.checkArraySizes
+import org.mkfl3x.jsondelta.Checks.checkExtraFields
+import org.mkfl3x.jsondelta.Checks.checkFieldType
+import org.mkfl3x.jsondelta.Checks.checkFieldValue
+import org.mkfl3x.jsondelta.Checks.checkJsonSyntax
+import org.mkfl3x.jsondelta.Checks.checkMissedFields
+import org.mkfl3x.jsondelta.Checks.checkTypes
 
 class JsonDelta {
 

@@ -1,3 +1,5 @@
+package org.mkfl3x.jsondelta
+
 import com.google.gson.*
 
 object Checks {

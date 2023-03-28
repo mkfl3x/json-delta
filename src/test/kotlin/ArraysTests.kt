@@ -1,5 +1,6 @@
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import kotlin.test.assertTrue
+import org.mkfl3x.jsondelta.JsonDelta
 
 class ArraysTests {
 
@@ -11,24 +12,24 @@ class ArraysTests {
     @Test
     fun equalArrays() {
         val report = JsonDelta().compare(expected, expected)
-        assertTrue("Report should be 'success'") { report.success }
+        assertTrue(report.success, "Report should be 'success'")
     }
 
     @Test
     fun wrongArraySize() {
         val report = JsonDelta().compare(expected, wrongArraySize)
-        assertTrue("Report should not be 'success'") { !report.success }
+        assertTrue(!report.success, "Report should not be 'success'")
     }
 
     @Test
     fun wrongArrayElementType() {
         val report = JsonDelta().compare(expected, wrongArrayElementType)
-        assertTrue("Report should not be 'success'") { !report.success }
+        assertTrue(!report.success, "Report should not be 'success'")
     }
 
     @Test
     fun wrongArrayElementValue() {
         val report = JsonDelta().compare(expected, wrongArrayElementValue)
-        assertTrue("Report should not be 'success'") { !report.success }
+        assertTrue(!report.success, "Report should not be 'success'")
     }
 }

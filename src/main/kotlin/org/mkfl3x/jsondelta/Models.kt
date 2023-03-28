@@ -1,3 +1,5 @@
+package org.mkfl3x.jsondelta
+
 abstract class Mismatch(open val type: MismatchType)
 
 data class StructureMismatch(override val type: MismatchType) : Mismatch(type)
