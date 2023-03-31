@@ -2,20 +2,21 @@ package org.mkfl3x.jsondelta
 
 import com.google.gson.*
 import org.mkfl3x.jsondelta.Checks.checkArraySizes
+import org.mkfl3x.jsondelta.Checks.checkElementsType
 import org.mkfl3x.jsondelta.Checks.checkExtraFields
-import org.mkfl3x.jsondelta.Checks.checkFieldType
 import org.mkfl3x.jsondelta.Checks.checkFieldValue
 import org.mkfl3x.jsondelta.Checks.checkJsonSyntax
 import org.mkfl3x.jsondelta.Checks.checkMissedFields
-import org.mkfl3x.jsondelta.Checks.checkTypes
 
 class JsonDelta {
 
     private val features = mutableListOf<Feature>()
 
-    fun featureOn(feature: Feature) = apply { features.add(feature) }
+    fun feature(feature: Feature, enable: Boolean) = apply {
+        if(enable) features.add(feature) else features.remove(feature)
+    }
 
-    fun featureOff(feature: Feature) = apply { features.remove(feature) }
+    fun getUsedFeatures() = features
 
     fun compare(expected: String, actual: String, vararg ignoredFields: String): JsonDeltaReport =
         DeltaContext(ignoredFields.asList()).apply {
@@ -27,7 +28,7 @@ class JsonDelta {
     private fun comparisonResolver(expected: JsonElement, actual: JsonElement, fieldName: String, context: DeltaContext) {
         if (fieldName in context.ignoredFields)
             return
-        checkTypes(expected, actual)?.apply {
+        checkElementsType(expected, actual, features.contains(Feature.IGNORE_NUMBERS_TYPE))?.apply {
             context.addMismatch(fieldName, this)
             return
         }
@@ -67,7 +68,6 @@ class JsonDelta {
     private fun compareFields(expected: JsonPrimitive, actual: JsonPrimitive, fieldName: String, context: DeltaContext) {
         if (features.contains(Feature.CHECK_FIELDS_PRESENCE_ONLY))
             return
-        context.addMismatch(fieldName, checkFieldType(expected, actual))
         context.addMismatch(fieldName, checkFieldValue(expected, actual))
     }
 }

@@ -45,12 +45,12 @@ enum class MismatchType(val description: String) {
     OBJECT_MISSED_FIELDS("Object missed fields"),
     OBJECT_EXTRA_FIELDS("Object contains unexpected fields"),
     ARRAY_SIZE_MISMATCH("Array sizes are mismatched"),
-    VALUE_TYPE_MISMATCH("Type of value mismatch"),
     VALUE_MISMATCH("Value mismatch")
 }
 
 enum class Feature {
     IGNORE_EXTRA_FIELDS,
     IGNORE_MISSED_FIELDS,
+    IGNORE_NUMBERS_TYPE,
     CHECK_FIELDS_PRESENCE_ONLY
 }

@@ -11,9 +11,14 @@ object Checks {
         false
     }
 
-    fun checkTypes(expected: JsonElement, actual: JsonElement) = if (expected.javaClass != actual.javaClass)
-        ValueMismatch(MismatchType.OBJECT_TYPES_MISMATCH, expected.javaClass.simpleName, actual.javaClass.simpleName)
-    else null
+    fun checkElementsType(expected: JsonElement, actual: JsonElement, ignoreNumberType: Boolean) =
+        if (ignoreNumberType && isNumber(expected) && isNumber(actual))
+            null
+        else (getObjectType(expected) to getObjectType(actual)).let {
+            if (it.first != it.second)
+                ValueMismatch(MismatchType.OBJECT_TYPES_MISMATCH, it.first, it.second)
+            else null
+        }
 
     fun checkArraySizes(expected: JsonArray, actual: JsonArray) = if (expected.size() != actual.size())
         ValueMismatch(MismatchType.ARRAY_SIZE_MISMATCH, expected.size().toString(), actual.size().toString())
@@ -31,21 +36,24 @@ object Checks {
         else null
     }
 
-    fun checkFieldType(expected: JsonPrimitive, actual: JsonPrimitive) = if (
-        expected.isString && actual.isString.not() ||
-        expected.isNumber && actual.isNumber.not() ||
-        expected.isBoolean && actual.isBoolean.not()
-    ) ValueMismatch(MismatchType.VALUE_TYPE_MISMATCH, getPrimitiveType(expected), getPrimitiveType(actual))
-    else null
-
     fun checkFieldValue(expected: JsonPrimitive, actual: JsonPrimitive) = if (expected != actual)
         ValueMismatch(MismatchType.VALUE_MISMATCH, expected.toString(), actual.toString())
     else null
 
+    private fun getObjectType(value: JsonElement) = when {
+        value.isJsonPrimitive -> getPrimitiveType(value.asJsonPrimitive)
+        value.isJsonObject -> "object"
+        value.isJsonArray -> "array"
+        value.isJsonNull -> "null"
+        else -> throw Exception("Unexpected object type")
+    }
+
     private fun getPrimitiveType(value: JsonPrimitive) = when {
-        value.isString -> "string"
-        value.isNumber -> "number"
         value.isBoolean -> "boolean"
+        value.isString -> "string"
+        value.isNumber -> if (value.toString().contains(".")) "float" else "integer"
         else -> throw Exception("Unexpected primitive type")
     }
+
+    private fun isNumber(element: JsonElement) = element.isJsonPrimitive && element.asJsonPrimitive.isNumber
 }
