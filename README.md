@@ -10,8 +10,9 @@ JsonDelta recursively check each field for few mismatch types:
 - Array size mismatch
 
 You can configure your JsonDelta instance with following features:
-- `Feature.IGNORE_EXTRA_FIELDS` - Ignoring all non-expected fields
-- `Feature.CHECK_FIELDS_PRESENCE_ONLY` - Check only fields presence, ignoring their values
+- `Feature.IGNORE_EXTRA_FIELDS` - Compare objects even actual JSON has unexpected fields
+- `Feature.IGNORE_MISSED_FIELDS` - Compare objects even actual JSON hasn't expected fields
+- `Feature.CHECK_FIELDS_PRESENCE_ONLY` - Check only fields presence, ignoring their values 
 
 ## How to use
 ### Gradle

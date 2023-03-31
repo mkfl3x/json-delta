@@ -47,16 +47,21 @@ class JsonDelta {
     }
 
     private fun compareObjects(expected: JsonObject, actual: JsonObject, fieldName: String, context: DeltaContext) {
-        checkMissedFields(expected, actual)?.apply {
-            context.addMismatch(fieldName, this)
-            return
-        }
-        if (!features.contains(Feature.IGNORE_EXTRA_FIELDS))
+        if (features.contains(Feature.IGNORE_MISSED_FIELDS).not())
+            checkMissedFields(expected, actual)?.apply {
+                context.addMismatch(fieldName, this)
+                return
+            }
+        if (features.contains(Feature.IGNORE_EXTRA_FIELDS).not())
             checkExtraFields(expected, actual)?.apply {
                 context.addMismatch(fieldName, this)
                 return
             }
-        expected.asMap().forEach { comparisonResolver(it.value, actual.get(it.key), "$fieldName.${it.key}", context) }
+        expected.asMap().forEach {
+            if (actual.get(it.key) == null && features.contains(Feature.IGNORE_MISSED_FIELDS))
+                return@forEach
+            comparisonResolver(it.value, actual.get(it.key), "$fieldName.${it.key}", context)
+        }
     }
 
     private fun compareFields(expected: JsonPrimitive, actual: JsonPrimitive, fieldName: String, context: DeltaContext) {

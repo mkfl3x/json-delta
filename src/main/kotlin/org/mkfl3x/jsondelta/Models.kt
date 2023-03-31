@@ -51,5 +51,6 @@ enum class MismatchType(val description: String) {
 
 enum class Feature {
     IGNORE_EXTRA_FIELDS,
+    IGNORE_MISSED_FIELDS,
     CHECK_FIELDS_PRESENCE_ONLY
 }
