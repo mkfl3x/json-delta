@@ -61,7 +61,7 @@ class JsonDelta {
         expected.asMap().forEach {
             if (actual.get(it.key) == null && features.contains(Feature.IGNORE_MISSED_FIELDS))
                 return@forEach
-            comparisonResolver(it.value, actual.get(it.key), "$fieldName.${it.key}", context)
+            comparisonResolver(it.value, actual.get(it.key), "$fieldName -> ${it.key}", context)
         }
     }
 

@@ -7,7 +7,7 @@ object Checks {
     fun checkJsonSyntax(json: String, name: String, context: DeltaContext) = try {
         JsonParser.parseString(json) is JsonElement
     } catch (e: JsonSyntaxException) {
-        context.addMismatch("root", StructureMismatch(MismatchType.NOT_VALID_JSON))
+        context.addMismatch("root", StructureMismatch(MismatchType.NOT_VALID_JSON, name))
         false
     }
 
@@ -26,13 +26,13 @@ object Checks {
 
     fun checkMissedFields(expected: JsonObject, actual: JsonObject) = expected.keySet().subtract(actual.keySet()).let {
         if (it.isNotEmpty())
-            ObjectMismatch(MismatchType.OBJECT_MISSED_FIELDS, it.joinToString(", "))
+            ObjectMismatch(MismatchType.OBJECT_MISSED_FIELDS, it.joinToString(", ") { s -> "\"$s\"" })
         else null
     }
 
     fun checkExtraFields(expected: JsonObject, actual: JsonObject) = actual.keySet().subtract(expected.keySet()).let {
         if (it.isNotEmpty())
-            ObjectMismatch(MismatchType.OBJECT_EXTRA_FIELDS, it.joinToString(", "))
+            ObjectMismatch(MismatchType.OBJECT_EXTRA_FIELDS, it.joinToString(", ") { s -> "\"$s\"" })
         else null
     }
 
