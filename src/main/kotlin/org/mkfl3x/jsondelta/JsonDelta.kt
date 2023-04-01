@@ -10,13 +10,18 @@ import org.mkfl3x.jsondelta.Checks.checkMissedFields
 
 class JsonDelta {
 
+    private val gson = Gson()
+
     private val features = mutableListOf<Feature>()
 
-    fun feature(feature: Feature, enable: Boolean) = apply {
-        if(enable) features.add(feature) else features.remove(feature)
-    }
+    fun compare(expected: Any, actual: Any, vararg ignoredFields: String) =
+        compare(gson.toJson(expected), gson.toJson(actual), *ignoredFields)
 
-    fun getUsedFeatures() = features
+    fun compare(expected: String, actual: Any, vararg ignoredFields: String) =
+        compare(expected, gson.toJson(actual), *ignoredFields)
+
+    fun compare(expected: Any, actual: String, vararg ignoredFields: String) =
+        compare(gson.toJson(expected), actual, *ignoredFields)
 
     fun compare(expected: String, actual: String, vararg ignoredFields: String): JsonDeltaReport =
         DeltaContext(ignoredFields.asList()).apply {
@@ -24,6 +29,12 @@ class JsonDelta {
                 return@apply
             comparisonResolver(JsonParser.parseString(expected), JsonParser.parseString(actual), "root", this)
         }.getReport()
+
+    fun feature(feature: Feature, enable: Boolean) = apply {
+        if (enable) features.add(feature) else features.remove(feature)
+    }
+
+    fun getUsedFeatures() = features.toList()
 
     private fun comparisonResolver(expected: JsonElement, actual: JsonElement, fieldName: String, context: DeltaContext) {
         if (fieldName in context.ignoredFields)
