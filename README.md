@@ -1,38 +1,79 @@
-## What is it
-Library for comparison JSON objects/arrays based on Gson
-
-## How it works
-JsonDelta recursively check each field for few mismatch types:
-- Mismatch of value type
-- Mismatch of value content
-- Missed fields in object
-- Unexpected fields in object [optional]
-- Array size mismatch
-
-You can configure your JsonDelta instance with following features:
-- `Feature.IGNORE_EXTRA_FIELDS` - Compare objects even actual JSON has unexpected fields
-- `Feature.IGNORE_MISSED_FIELDS` - Compare objects even actual JSON hasn't expected fields
-- `Feature.CHECK_FIELDS_PRESENCE_ONLY` - Check only fields presence, ignoring their values 
-
+## json-delta
+Java (Kotlin) library for comparing JSON objects/arrays. Based on [**Gson**](https://github.com/google/gson).  
+It recursively checks each fields for following mismatch types:
+- Field/value type
+- Field value content
+- Missed fields
+- Unexpected fields
+- Array size
 ## How to use
+
 ### Gradle
-Add following snippet to the **build.gradle** file `dependencies` section:
+Add following snippet to the **build.gradle** file `dependencies{}` section:
+```groovy
+implementation("io.github.mkfl3x:json-delta:0.6-beta")
 ```
-implementation("io.github.mkfl3x:json-delta:0.4-beta")
-```
+
 ### Maven
 Add following snippet to the **pom.xml** file `<dependencies>` section:
-```
+```xml
 <dependency>
     <groupId>io.github.mkfl3x</groupId>
     <artifactId>json-delta</artifactId>
-    <version>0.4-beta</version>
+    <version>0.6-beta</version>
 </dependency>
 ```
-## Quick start
-Let's take two json objects for comparison: 
-- First one we'll call **'expected'**
+## Features
+You can customize `JsonDelta` instance with following functions:
+- `Feature.IGNORE_EXTRA_FIELDS` - Do not consider non-expected fields in 'actual' JSON
+- `Feature.IGNORE_MISSED_FIELDS` - Do not consider missed fields in 'actual' JSON
+- `Feature.IGNORE_NUMBERS_TYPE` - Do not consider is value 'float' or 'integer' and compare as is
+- `Feature.CHECK_FIELDS_PRESENCE_ONLY` - Check only fields presence and ignore their values
+
+For turning on or off use method `feature()`:
+```java
+jsonDelta.feature(Feature.IGNORE_EXTRA_FIELDS, true);  // turn on
+jsonDelta.feature(Feature.IGNORE_EXTRA_FIELDS, false); // turn off
 ```
+## Ignoring fields
+You can ignore any number of compared JSON fields via `vararg ignoredFields` parameter of `compare()` method.
+> ##### '$' symbol means JSON object or array provided for comparison
+
+Please, use following syntax:
+- For fields/arrays: `"$.some_field.some_sub_field"` - split field names by `.`
+- For specific array element: `"$.some_field.some_array[3]"` - split field names by `.` and add index for array field with `[]`
+
+Example:
+```java
+{
+  "a": 1,
+  "b": 2,
+  "c": [
+    {"x": 1, "y": 2},
+    {"x": 3, "y": 4},
+    {"x": 5, "y": 6}
+  ]
+}
+
+// field "a" and field "x" of element with index 2 from array "c" will be excluded from comparison
+jsonDelta.compare(expected, actual, "$.a", "$.c[2].x");
+```
+## Report:
+Method `compare()` returns  `JsonDeltaReport` object where you can find following fields:
+- **success** (`Boolean`): Comparison result (_success_ if JSONs are equals)
+- **mismatches** (`List<Mismatch>`): List of all mismatches
+
+And you can print it as string. Output example:
+```text
+Status: failed
+Mismatches:
+"$.a": Value mismatch. Expected: "ciao"; Actual: "hello"
+"$.b.z[3]": Object types are mismatched. Expected: integer; Actual: float
+```
+## Quick start
+Let's take two JSON objects for comparison:
+- First one we'll call **'expected'**
+```json
 {
     "a": "hello",
     "b": {
@@ -43,61 +84,38 @@ Let's take two json objects for comparison:
 }
 ```
 - Second one we'll call **'actual'**
-```
+```json
 {
     "a": "hello",
     "b": {
         "x": 1,
         "y": false,
-        "z": [1, 2, 4]
+        "z": [1, 2, 3.0]
     },
     "c": "I'm unexpected field"
 }
 ```
 Then compare them and print report:
 #### Java:
-```
-JsonDelta jsonDelta = new JsonDelta(); // create JsonDelta instance
-JsonDeltaReport report = jsonDelta.compare(expected, actual); // compare JSONs
-System.out.print(report); // print report
+```java
+JsonDelta jsonDelta = new JsonDelta()
+    .feature(Feature.IGNORE_EXTRA_FIELDS, true)  // for exclude non-expected field "$.c"
+    .feature(Feature.IGNORE_NUMBERS_TYPE, true); // for compare value with index 3 in array "$.b.z[3]" as is
+// JsonDeltaReport report = jsonDelta.compare(expected, actual, "$.b.y"); // comparison with excluded field "$.b.y"
+System.out.println(report); // method toString() of JsonDeltaReport class is overridden
 ```
 #### Kotlin:
+```kotlin
+val jsonDelta = JsonDelta()
+    .feature(Feature.IGNORE_EXTRA_FIELDS, true) // for exclude non-expected field "$.c"
+    .feature(Feature.IGNORE_NUMBERS_TYPE, true) // for compare value with index 3 in array "$.b.z[3]" as is
+val report = jsonDelta.compare(expected, actual, "$.b.y") // comparison with excluded field "$.b.y"
+println(report) // method toString() of JsonDeltaReport class is overridden
 ```
-val jsonDelta = JsonDelta() // create JsonDelta instance
-val report = jsonDelta.compare(expected, actual) // compare JSONs
-print(report) // print report
-```
-#### Console output:
-```
-Status: failed
-Mismatches:
- Field "root"
-    - Object contains unexpected fields. Fields:"c"
-```
-Here we can see that **actual** JSON has unexpected field **"c"** on the top level (it's called **root**).<br>
-### Functions:
-Let's turn on ignoring unexpected fields feature for our **jsonDelta** and make comparison one more time
-```
-jsonDelta.featureOn(Feature.IGNORE_EXTRA_FIELDS); // use featureOff() for turn off feature
-```
-#### Console output:
-```
-Status: failed
-Mismatches:
- Field "root.b.y"
-    - Value mismatch. Expected: "true"; Actual: "false"
- Field "root.b.z[3]"
-    - Value mismatch. Expected: "3"; Actual: "4"
-```
-Here we can see that **jsonDelta** ignored **"c"** field, dived deeper in our JSONs and found new errors.<br>
-### Ignored fields
-Let's assume that those problem fields have dynamic values and we can't know them values, so we ignore them.<br>
-Compare one more time:
-```
-jsonDelta.compare(expected, actual, "root.b.y", "root.b.z[3]"); // third parameter is vararg, so ignore as much fields as you want 
-```
-#### Console output:
-```
-Status: success
-```
-Great! JSONs are compared.
+Method `compare()` is overloaded for following types combinations:
+- String String
+- String Object
+- Object String
+- Object Object
+---
+#### Thanks for using!
