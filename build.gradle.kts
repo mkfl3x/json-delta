@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.mkfl3x"
-version = "0.4-beta"
+version = "0.6-beta"
 
 repositories {
     mavenCentral()
@@ -37,8 +37,8 @@ publishing {
                 }
                 licenses {
                     license {
-                        name.set("Apache 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                        name.set("MIT License")
+                        url.set("https://opensource.org/license/mit/")
                     }
                 }
                 scm {
