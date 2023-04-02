@@ -27,7 +27,7 @@ class JsonDelta {
         DeltaContext(ignoredFields.asList()).apply {
             if (!checkJsonSyntax(expected, "expected", this) || !checkJsonSyntax(actual, "actual", this))
                 return@apply
-            comparisonResolver(JsonParser.parseString(expected), JsonParser.parseString(actual), "root", this)
+            comparisonResolver(JsonParser.parseString(expected), JsonParser.parseString(actual), "$", this)
         }.getReport()
 
     fun feature(feature: Feature, enable: Boolean) = apply {
@@ -72,7 +72,7 @@ class JsonDelta {
         expected.asMap().forEach {
             if (actual.get(it.key) == null && features.contains(Feature.IGNORE_MISSED_FIELDS))
                 return@forEach
-            comparisonResolver(it.value, actual.get(it.key), "$fieldName -> ${it.key}", context)
+            comparisonResolver(it.value, actual.get(it.key), "$fieldName.${it.key}", context)
         }
     }
 
