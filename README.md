@@ -1,3 +1,5 @@
+![build](https://github.com/mkfl3x/json-delta/actions/workflows/build.yml/badge.svg)
+
 ## json-delta
 Java (Kotlin) library for comparing JSON objects/arrays. Based on [**Gson**](https://github.com/google/gson).  
 It recursively checks each fields for following mismatch types:
