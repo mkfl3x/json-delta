@@ -2,9 +2,9 @@ package org.mkfl3x.jsondelta
 
 abstract class Mismatch {
 
-    protected abstract val type: MismatchType
+    abstract val type: MismatchType
 
-    protected val description
+    val description
         get() = type.description
 
     fun print() = when (this) {

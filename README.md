@@ -11,7 +11,7 @@ It recursively checks each fields for following mismatch types:
 ### Gradle
 Add following snippet to the **build.gradle** file `dependencies{}` section:
 ```groovy
-implementation("io.github.mkfl3x:json-delta:0.6-beta")
+implementation("io.github.mkfl3x:json-delta:0.7-beta")
 ```
 
 ### Maven
@@ -20,7 +20,7 @@ Add following snippet to the **pom.xml** file `<dependencies>` section:
 <dependency>
     <groupId>io.github.mkfl3x</groupId>
     <artifactId>json-delta</artifactId>
-    <version>0.6-beta</version>
+    <version>0.7-beta</version>
 </dependency>
 ```
 ## Features
@@ -37,26 +37,38 @@ jsonDelta.feature(Feature.IGNORE_EXTRA_FIELDS, false); // turn off
 ```
 ## Ignoring fields
 You can ignore any number of compared JSON fields via `vararg ignoredFields` parameter of `compare()` method.
-> ##### '$' symbol means JSON object or array provided for comparison
+There are two ways:
+- Using explicit field path `root.object.field` or `root.array[2].field` for arrays
+- Using **regex**, like this `root.array\[[1-3]\].\[[a,b]\]`
 
-Please, use following syntax:
-- For fields/arrays: `"$.some_field.some_sub_field"` - split field names by `.`
-- For specific array element: `"$.some_field.some_array[3]"` - split field names by `.` and add index for array field with `[]`
+> - '**root**' means the top level of JSON object or array  
+> - all fields should be splitted by dots ( **.** )
+> - array indexes should be placed in braces ( **[ ]** )
 
 Example:
 ```java
+expected:
 {
-  "a": 1,
+  "a": "hello",
   "b": 2,
-  "c": [
-    {"x": 1, "y": 2},
-    {"x": 3, "y": 4},
-    {"x": 5, "y": 6}
-  ]
+  "c": [1, 2, 3, 4, 5]
 }
 
-// field "a" and field "x" of element with index 2 from array "c" will be excluded from comparison
-jsonDelta.compare(expected, actual, "$.a", "$.c[2].x");
+actual:
+{
+  "a": null,
+  "b": 2,
+  "c": [1, 2, 3, 0, 0]
+}
+
+// let's assume that field "root.a" is flaky 
+// and also we are interested only in first 3 elements of array "root.c"
+        
+// exlude fields with explicit field paths
+jsonDelta.compare(expected, actual, "root.a", "root.c[4]", "root.c[5]");
+
+// exlude fields with regular expressions
+jsonDelta.compare(expected, actual, "root.a", "root.c\\[[^1-3]\\]");
 ```
 ## Report:
 Method `compare()` returns  `JsonDeltaReport` object where you can find following fields:
@@ -67,10 +79,10 @@ And you can print it as string. Output example:
 ```text
 Status: failed
 Mismatches:
-"$.a": Value mismatch. Expected: "ciao"; Actual: "hello"
-"$.b.z[3]": Object types are mismatched. Expected: integer; Actual: float
+"root.a": Value mismatch. Expected: "ciao"; Actual: "hello"
+"root.b.z[3]": Object types are mismatched. Expected: integer; Actual: float
 ```
-## Quick start
+## Quickstart
 Let's take two JSON objects for comparison:
 - First one we'll call **'expected'**
 ```json
@@ -99,17 +111,17 @@ Then compare them and print report:
 #### Java:
 ```java
 JsonDelta jsonDelta = new JsonDelta()
-    .feature(Feature.IGNORE_EXTRA_FIELDS, true)  // for exclude non-expected field "$.c"
-    .feature(Feature.IGNORE_NUMBERS_TYPE, true); // for compare value with index 3 in array "$.b.z[3]" as is
-// JsonDeltaReport report = jsonDelta.compare(expected, actual, "$.b.y"); // comparison with excluded field "$.b.y"
+    .feature(Feature.IGNORE_EXTRA_FIELDS, true)  // for exclude non-expected field "root.c"
+    .feature(Feature.IGNORE_NUMBERS_TYPE, true); // for compare value with index 3 in array "root.b.z[3]" as is
+JsonDeltaReport report = jsonDelta.compare(expected, actual, "root.b.y"); // comparison with excluded field "root.b.y"
 System.out.println(report); // method toString() of JsonDeltaReport class is overridden
 ```
 #### Kotlin:
 ```kotlin
 val jsonDelta = JsonDelta()
-    .feature(Feature.IGNORE_EXTRA_FIELDS, true) // for exclude non-expected field "$.c"
-    .feature(Feature.IGNORE_NUMBERS_TYPE, true) // for compare value with index 3 in array "$.b.z[3]" as is
-val report = jsonDelta.compare(expected, actual, "$.b.y") // comparison with excluded field "$.b.y"
+    .feature(Feature.IGNORE_EXTRA_FIELDS, true) // for exclude non-expected field "root.c"
+    .feature(Feature.IGNORE_NUMBERS_TYPE, true) // for compare value with index 3 in array "root.b.z[3]" as is
+val report = jsonDelta.compare(expected, actual, "root.b.y") // comparison with excluded field "root.b.y"
 println(report) // method toString() of JsonDeltaReport class is overridden
 ```
 Method `compare()` is overloaded for following types combinations:

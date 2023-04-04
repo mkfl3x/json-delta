@@ -27,7 +27,7 @@ class JsonDelta {
         DeltaContext(ignoredFields.asList()).apply {
             if (!checkJsonSyntax(expected, "expected", this) || !checkJsonSyntax(actual, "actual", this))
                 return@apply
-            comparisonResolver(JsonParser.parseString(expected), JsonParser.parseString(actual), "$", this)
+            comparisonResolver(JsonParser.parseString(expected), JsonParser.parseString(actual), "root", this)
         }.getReport()
 
     fun feature(feature: Feature, enable: Boolean) = apply {
@@ -37,7 +37,7 @@ class JsonDelta {
     fun getUsedFeatures() = features.toList()
 
     private fun comparisonResolver(expected: JsonElement, actual: JsonElement, fieldName: String, context: DeltaContext) {
-        if (fieldName in context.ignoredFields)
+        if (fieldName in context.ignoredFields || context.ignoredFields.any { Regex(it).matches(fieldName) } )
             return
         checkElementsType(expected, actual, features.contains(Feature.IGNORE_NUMBERS_TYPE))?.apply {
             context.addMismatch(fieldName, this)
