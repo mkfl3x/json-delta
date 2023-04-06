@@ -25,6 +25,15 @@ class FeaturesManagementTest : BaseTest() {
         checkFeaturesPresence(jsonDelta, Feature.IGNORE_MISSED_FIELDS)
     }
 
+    @Test
+    fun tryToAddDuplicatedFeatures(){
+        val jsonDelta = JsonDelta()
+            .feature(Feature.IGNORE_EXTRA_FIELDS, true)
+            .feature(Feature.IGNORE_EXTRA_FIELDS, true)
+
+        checkFeaturesPresence(jsonDelta, Feature.IGNORE_EXTRA_FIELDS)
+    }
+
     private fun checkFeaturesPresence(jsonDelta: JsonDelta, vararg expectedFeatures: Feature) {
         assertEquals(expectedFeatures.size, jsonDelta.getUsedFeatures().size, "Unexpected number of features")
         expectedFeatures.forEach {

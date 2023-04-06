@@ -44,9 +44,8 @@ object Checks {
         if (context.isFeatureUsed(Feature.IGNORE_EXTRA_FIELDS))
             return
         actual.keySet().subtract(expected.keySet()).let {
-            if (it.isNotEmpty()) {
+            if (it.isNotEmpty())
                 context.addMismatch(ObjectMismatch(field, MismatchType.OBJECT_EXTRA_FIELDS, it.toList()))
-            }
         }
     }
 

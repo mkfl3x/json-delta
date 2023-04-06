@@ -60,11 +60,11 @@ class DeltaContext(private val ignoredFields: List<String>, private val features
 
 enum class MismatchType(val description: String) {
     NOT_VALID_JSON("JSON object is not valid"),
-    TYPE_MISMATCH("Type mismatch"),
     OBJECT_MISSED_FIELDS("Object doesn't contain expected fields"),
     OBJECT_EXTRA_FIELDS("Object contains unexpected fields"),
     ARRAY_SIZE_MISMATCH("Array size mismatch"),
-    VALUE_MISMATCH("Value mismatch")
+    VALUE_MISMATCH("Value mismatch"),
+    TYPE_MISMATCH("Type mismatch")
 }
 
 enum class Feature {

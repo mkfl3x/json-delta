@@ -1,4 +1,5 @@
-![build](https://github.com/mkfl3x/json-delta/actions/workflows/build.yml/badge.svg)
+![Build](https://img.shields.io/github/actions/workflow/status/mkfl3x/json-delta/build.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.mkfl3x/json-delta?color=blue)](https://central.sonatype.com/artifact/io.github.mkfl3x/json-delta)
 
 ## json-delta
 Java (Kotlin) library for comparing JSON objects/arrays. Based on [**Gson**](https://github.com/google/gson).  
