@@ -39,8 +39,8 @@ class JsonDelta {
     private fun comparisonResolver(expected: JsonElement, actual: JsonElement, fieldName: String, context: DeltaContext) {
         if (fieldName in context.ignoredFields || context.ignoredFields.any { Regex(it).matches(fieldName) } )
             return
-        checkElementsType(expected, actual, features.contains(Feature.IGNORE_NUMBERS_TYPE))?.apply {
-            context.addMismatch(fieldName, this)
+        checkElementsType(fieldName, expected, actual, features.contains(Feature.IGNORE_NUMBERS_TYPE))?.apply {
+            context.addMismatch(this)
             return
         }
         when (expected) {
@@ -51,8 +51,8 @@ class JsonDelta {
     }
 
     private fun compareArrays(expected: JsonArray, actual: JsonArray, fieldName: String, context: DeltaContext) {
-        checkArraySizes(expected, actual)?.apply {
-            context.addMismatch(fieldName, this)
+        checkArraySizes(fieldName, expected, actual)?.apply {
+            context.addMismatch(this)
             return
         }
         expected.forEachIndexed { i, _ -> comparisonResolver(expected[i], actual[i], "$fieldName[${i + 1}]", context) }
@@ -60,13 +60,13 @@ class JsonDelta {
 
     private fun compareObjects(expected: JsonObject, actual: JsonObject, fieldName: String, context: DeltaContext) {
         if (features.contains(Feature.IGNORE_MISSED_FIELDS).not())
-            checkMissedFields(expected, actual)?.apply {
-                context.addMismatch(fieldName, this)
+            checkMissedFields(fieldName, expected, actual)?.apply {
+                context.addMismatch(this)
                 return
             }
         if (features.contains(Feature.IGNORE_EXTRA_FIELDS).not())
-            checkExtraFields(expected, actual)?.apply {
-                context.addMismatch(fieldName, this)
+            checkExtraFields(fieldName, expected, actual)?.apply {
+                context.addMismatch(this)
                 return
             }
         expected.asMap().forEach {
@@ -79,6 +79,6 @@ class JsonDelta {
     private fun compareFields(expected: JsonPrimitive, actual: JsonPrimitive, fieldName: String, context: DeltaContext) {
         if (features.contains(Feature.CHECK_FIELDS_PRESENCE_ONLY))
             return
-        context.addMismatch(fieldName, checkFieldValue(expected, actual))
+        context.addMismatch(checkFieldValue(fieldName, expected, actual))
     }
 }

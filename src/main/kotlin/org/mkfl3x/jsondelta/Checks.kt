@@ -7,37 +7,39 @@ object Checks {
     fun checkJsonSyntax(json: String, name: String, context: DeltaContext) = try {
         JsonParser.parseString(json) is JsonElement
     } catch (e: JsonSyntaxException) {
-        context.addMismatch("root", StructureMismatch(MismatchType.NOT_VALID_JSON, name))
+        context.addMismatch(StructureMismatch("root", MismatchType.NOT_VALID_JSON, name))
         false
     }
 
-    fun checkElementsType(expected: JsonElement, actual: JsonElement, ignoreNumberType: Boolean) =
+    fun checkElementsType(field: String, expected: JsonElement, actual: JsonElement, ignoreNumberType: Boolean) =
         if (ignoreNumberType && isNumber(expected) && isNumber(actual))
             null
         else (getObjectType(expected) to getObjectType(actual)).let {
             if (it.first != it.second)
-                ValueMismatch(MismatchType.OBJECT_TYPES_MISMATCH, it.first, it.second)
+                ValueMismatch(field, MismatchType.TYPES_MISMATCH, it.first, it.second)
             else null
         }
 
-    fun checkArraySizes(expected: JsonArray, actual: JsonArray) = if (expected.size() != actual.size())
-        ValueMismatch(MismatchType.ARRAY_SIZE_MISMATCH, expected.size().toString(), actual.size().toString())
+    fun checkArraySizes(field: String, expected: JsonArray, actual: JsonArray) = if (expected.size() != actual.size())
+        ValueMismatch(field, MismatchType.ARRAY_SIZE_MISMATCH, expected.size().toString(), actual.size().toString())
     else null
 
-    fun checkMissedFields(expected: JsonObject, actual: JsonObject) = expected.keySet().subtract(actual.keySet()).let {
-        if (it.isNotEmpty())
-            ObjectMismatch(MismatchType.OBJECT_MISSED_FIELDS, it.joinToString(", ") { s -> "\"$s\"" })
-        else null
-    }
+    fun checkMissedFields(field: String, expected: JsonObject, actual: JsonObject) =
+        expected.keySet().subtract(actual.keySet()).let {
+            if (it.isNotEmpty())
+                ObjectMismatch(field, MismatchType.OBJECT_MISSED_FIELDS, it.toList())
+            else null
+        }
 
-    fun checkExtraFields(expected: JsonObject, actual: JsonObject) = actual.keySet().subtract(expected.keySet()).let {
-        if (it.isNotEmpty())
-            ObjectMismatch(MismatchType.OBJECT_EXTRA_FIELDS, it.joinToString(", ") { s -> "\"$s\"" })
-        else null
-    }
+    fun checkExtraFields(field: String, expected: JsonObject, actual: JsonObject) =
+        actual.keySet().subtract(expected.keySet()).let {
+            if (it.isNotEmpty())
+                ObjectMismatch(field, MismatchType.OBJECT_EXTRA_FIELDS, it.toList())
+            else null
+        }
 
-    fun checkFieldValue(expected: JsonPrimitive, actual: JsonPrimitive) = if (expected != actual)
-        ValueMismatch(MismatchType.VALUE_MISMATCH, expected.toString(), actual.toString())
+    fun checkFieldValue(field: String, expected: JsonPrimitive, actual: JsonPrimitive) = if (expected != actual)
+        ValueMismatch(field, MismatchType.VALUE_MISMATCH, expected.toString(), actual.toString())
     else null
 
     private fun getObjectType(value: JsonElement) = when {
