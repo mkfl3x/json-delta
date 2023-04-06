@@ -2,7 +2,7 @@
 
 ## json-delta
 Java (Kotlin) library for comparing JSON objects/arrays. Based on [**Gson**](https://github.com/google/gson).  
-It recursively checks each fields for following mismatch types:
+It recursively checks each field for following mismatch types:
 - Field/value type
 - Field value content
 - Missed fields
@@ -43,20 +43,20 @@ There are two ways:
 - Using explicit field path `root.object.field` or `root.array[2].field` for arrays
 - Using **regex**, like this `root.array\[[1-3]\].\[[a,b]\]`
 
-> - '**root**' means the top level of JSON object or array  
+> - '**root**' means the top level of JSON object or array
 > - all fields should be splitted by dots ( **.** )
-> - array indexes should be placed in braces ( **[ ]** )
+> - array indexes should be placed in square brackets ( **[ ]** )
 
-Example:
+**Example**:
 ```java
-expected:
+// expected
 {
   "a": "hello",
   "b": 2,
   "c": [1, 2, 3, 4, 5]
 }
 
-actual:
+// actual
 {
   "a": null,
   "b": 2,
@@ -82,7 +82,7 @@ And you can print it as string. Output example:
 Status: failed
 Mismatches:
 "root.a": Value mismatch. Expected: "ciao"; Actual: "hello"
-"root.b.z[3]": Object types are mismatched. Expected: integer; Actual: float
+"root.b.z[3]": Type mismatch. Expected: integer; Actual: float
 ```
 ## Quickstart
 Let's take two JSON objects for comparison:
@@ -127,9 +127,9 @@ val report = jsonDelta.compare(expected, actual, "root.b.y") // comparison with 
 println(report) // method toString() of JsonDeltaReport class is overridden
 ```
 Method `compare()` is overloaded for following types combinations:
-- String String
-- String Object
-- Object String
-- Object Object
+- String - String
+- String - Object
+- Object - String
+- Object - Object
 ---
 #### Thanks for using!

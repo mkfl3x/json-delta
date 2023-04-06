@@ -40,7 +40,7 @@ class ValuesTest : BaseTest() {
             ValueMismatch("root.booleanValue", MismatchType.VALUE_MISMATCH, "true", "false"),
             ValueMismatch("root.integerValue", MismatchType.VALUE_MISMATCH, "1", "2"),
             ValueMismatch("root.floatValue", MismatchType.VALUE_MISMATCH, "1.0", "2.5"),
-            ValueMismatch("root.nullValue", MismatchType.TYPES_MISMATCH, "null", "string"),
+            ValueMismatch("root.nullValue", MismatchType.TYPE_MISMATCH, "null", "string"),
             ValueMismatch("root.objectValue.y", MismatchType.VALUE_MISMATCH, "2", "3"),
             ValueMismatch("root.arrayValue[2]", MismatchType.VALUE_MISMATCH, "2", "4")
         )

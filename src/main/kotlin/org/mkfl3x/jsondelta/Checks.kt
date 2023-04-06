@@ -4,43 +4,58 @@ import com.google.gson.*
 
 object Checks {
 
-    fun checkJsonSyntax(json: String, name: String, context: DeltaContext) = try {
+    fun isJsonValid(json: String, name: String, context: DeltaContext) = try {
         JsonParser.parseString(json) is JsonElement
+        true
     } catch (e: JsonSyntaxException) {
         context.addMismatch(StructureMismatch("root", MismatchType.NOT_VALID_JSON, name))
         false
     }
 
-    fun checkElementsType(field: String, expected: JsonElement, actual: JsonElement, ignoreNumberType: Boolean) =
-        if (ignoreNumberType && isNumber(expected) && isNumber(actual))
-            null
+    fun areTypesEqual(field: String, expected: JsonElement, actual: JsonElement, context: DeltaContext) =
+        if (context.isFeatureUsed(Feature.CHECK_FIELDS_PRESENCE_ONLY))
+            true
+        else if (context.isFeatureUsed(Feature.IGNORE_NUMBERS_TYPE) && isNumber(expected) && isNumber(actual))
+            true
         else (getObjectType(expected) to getObjectType(actual)).let {
-            if (it.first != it.second)
-                ValueMismatch(field, MismatchType.TYPES_MISMATCH, it.first, it.second)
-            else null
+            if (it.first != it.second) {
+                context.addMismatch(ValueMismatch(field, MismatchType.TYPE_MISMATCH, it.first, it.second))
+                false
+            } else true
         }
 
-    fun checkArraySizes(field: String, expected: JsonArray, actual: JsonArray) = if (expected.size() != actual.size())
-        ValueMismatch(field, MismatchType.ARRAY_SIZE_MISMATCH, expected.size().toString(), actual.size().toString())
-    else null
+    fun areArraysSizeMatch(field: String, expected: JsonArray, actual: JsonArray, context: DeltaContext) =
+        if (expected.size() != actual.size()) {
+            context.addMismatch(ValueMismatch(field, MismatchType.ARRAY_SIZE_MISMATCH, expected.size().toString(), actual.size().toString()))
+            false
+        } else true
 
-    fun checkMissedFields(field: String, expected: JsonObject, actual: JsonObject) =
+    fun areFieldsMissed(field: String, expected: JsonObject, actual: JsonObject, context: DeltaContext) {
+        if (context.isFeatureUsed(Feature.IGNORE_MISSED_FIELDS))
+            return
         expected.keySet().subtract(actual.keySet()).let {
-            if (it.isNotEmpty())
-                ObjectMismatch(field, MismatchType.OBJECT_MISSED_FIELDS, it.toList())
-            else null
+            if (it.isNotEmpty()) {
+                context.addMismatch(ObjectMismatch(field, MismatchType.OBJECT_MISSED_FIELDS, it.toList()))
+            }
         }
+    }
 
-    fun checkExtraFields(field: String, expected: JsonObject, actual: JsonObject) =
+    fun areFieldsUnexpected(field: String, expected: JsonObject, actual: JsonObject, context: DeltaContext) {
+        if (context.isFeatureUsed(Feature.IGNORE_EXTRA_FIELDS))
+            return
         actual.keySet().subtract(expected.keySet()).let {
-            if (it.isNotEmpty())
-                ObjectMismatch(field, MismatchType.OBJECT_EXTRA_FIELDS, it.toList())
-            else null
+            if (it.isNotEmpty()) {
+                context.addMismatch(ObjectMismatch(field, MismatchType.OBJECT_EXTRA_FIELDS, it.toList()))
+            }
         }
+    }
 
-    fun checkFieldValue(field: String, expected: JsonPrimitive, actual: JsonPrimitive) = if (expected != actual)
-        ValueMismatch(field, MismatchType.VALUE_MISMATCH, expected.toString(), actual.toString())
-    else null
+    fun areFieldsEqual(field: String, expected: JsonPrimitive, actual: JsonPrimitive, context: DeltaContext) {
+        if (context.isFeatureUsed(Feature.CHECK_FIELDS_PRESENCE_ONLY))
+            return
+        if (expected != actual)
+            context.addMismatch(ValueMismatch(field, MismatchType.VALUE_MISMATCH, expected.toString(), actual.toString()))
+    }
 
     private fun getObjectType(value: JsonElement) = when {
         value.isJsonPrimitive -> getPrimitiveType(value.asJsonPrimitive)

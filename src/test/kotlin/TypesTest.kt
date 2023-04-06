@@ -80,7 +80,7 @@ class TypesTest : BaseTest() {
         checkReportFailed(report)
         checkMismatchesPresence(
             report,
-            ValueMismatch("root.value", MismatchType.TYPES_MISMATCH, expected.first, actual.first)
+            ValueMismatch("root.value", MismatchType.TYPE_MISMATCH, expected.first, actual.first)
         )
     }
 }

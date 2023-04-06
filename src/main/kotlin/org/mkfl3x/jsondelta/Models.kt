@@ -45,9 +45,13 @@ data class JsonDeltaReport(val success: Boolean, val mismatches: List<Mismatch>)
     """.trimMargin()
 }
 
-class DeltaContext(val ignoredFields: List<String>) {
+class DeltaContext(private val ignoredFields: List<String>, private val features: Set<Feature>) {
 
     private val mismatches = mutableListOf<Mismatch>()
+
+    fun isFieldIgnored(field: String) = field in ignoredFields || ignoredFields.any { Regex(it).matches(field) }
+
+    fun isFeatureUsed(feature: Feature) = feature in features
 
     fun addMismatch(mismatch: Mismatch?) = mismatch?.apply { mismatches.add(mismatch) }
 
@@ -56,10 +60,10 @@ class DeltaContext(val ignoredFields: List<String>) {
 
 enum class MismatchType(val description: String) {
     NOT_VALID_JSON("JSON object is not valid"),
-    TYPES_MISMATCH("Object types are mismatched"),
-    OBJECT_MISSED_FIELDS("Object missed fields"),
+    TYPE_MISMATCH("Type mismatch"),
+    OBJECT_MISSED_FIELDS("Object doesn't contain expected fields"),
     OBJECT_EXTRA_FIELDS("Object contains unexpected fields"),
-    ARRAY_SIZE_MISMATCH("Array sizes are mismatched"),
+    ARRAY_SIZE_MISMATCH("Array size mismatch"),
     VALUE_MISMATCH("Value mismatch")
 }
 
