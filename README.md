@@ -14,7 +14,7 @@ It recursively checks each field for following mismatch types:
 ### Gradle
 Add following snippet to the **build.gradle** file `dependencies{}` section:
 ```groovy
-implementation("io.github.mkfl3x:json-delta:0.7-beta")
+implementation("io.github.mkfl3x:json-delta:1.0")
 ```
 
 ### Maven
@@ -23,7 +23,7 @@ Add following snippet to the **pom.xml** file `<dependencies>` section:
 <dependency>
     <groupId>io.github.mkfl3x</groupId>
     <artifactId>json-delta</artifactId>
-    <version>0.7-beta</version>
+    <version>1.0</version>
 </dependency>
 ```
 ## Features
