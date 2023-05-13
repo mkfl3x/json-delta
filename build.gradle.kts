@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.mkfl3x"
-version = "1.0"
+version = "1.1"
 
 repositories {
     mavenCentral()

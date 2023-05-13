@@ -33,7 +33,7 @@ object Checks {
     fun areFieldsMissed(field: String, expected: JsonObject, actual: JsonObject, context: DeltaContext) {
         if (context.isFeatureUsed(Feature.IGNORE_MISSED_FIELDS))
             return
-        expected.keySet().subtract(actual.keySet()).let {
+        expected.keySet().subtract(actual.keySet()).filter { context.isFieldIgnored("$field.$it").not() }.let {
             if (it.isNotEmpty()) {
                 context.addMismatch(ObjectMismatch(field, MismatchType.OBJECT_MISSED_FIELDS, it.toList()))
             }
@@ -43,7 +43,7 @@ object Checks {
     fun areFieldsUnexpected(field: String, expected: JsonObject, actual: JsonObject, context: DeltaContext) {
         if (context.isFeatureUsed(Feature.IGNORE_EXTRA_FIELDS))
             return
-        actual.keySet().subtract(expected.keySet()).let {
+        actual.keySet().subtract(expected.keySet()).filter { context.isFieldIgnored("$field.$it").not() }.let {
             if (it.isNotEmpty())
                 context.addMismatch(ObjectMismatch(field, MismatchType.OBJECT_EXTRA_FIELDS, it.toList()))
         }
