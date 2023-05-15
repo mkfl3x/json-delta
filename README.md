@@ -14,7 +14,7 @@ It recursively checks each field for following mismatch types:
 ### Gradle
 Add following snippet to the **build.gradle** file `dependencies{}` section:
 ```groovy
-implementation("io.github.mkfl3x:json-delta:1.1")
+implementation("io.github.mkfl3x:json-delta:1.2")
 ```
 
 ### Maven
@@ -23,15 +23,29 @@ Add following snippet to the **pom.xml** file `<dependencies>` section:
 <dependency>
     <groupId>io.github.mkfl3x</groupId>
     <artifactId>json-delta</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```
 ## Features
-You can customize `JsonDelta` instance with following functions:
-- `Feature.IGNORE_EXTRA_FIELDS` - Do not consider non-expected fields in 'actual' JSON
-- `Feature.IGNORE_MISSED_FIELDS` - Do not consider missed fields in 'actual' JSON
-- `Feature.IGNORE_NUMBERS_TYPE` - Do not consider is value 'float' or 'integer' and compare as is
-- `Feature.CHECK_FIELDS_PRESENCE_ONLY` - Check only fields presence and ignore their values
+You can customize `JsonDelta` instance with following features:
+- `Feature.IGNORE_EXTRA_FIELDS` - Do not consider non-expected fields in 'actual' JSON  
+  example: `expected {"x": 1} == actual {"x": 1, "y": 2}`
+
+
+- `Feature.IGNORE_MISSED_FIELDS` - Do not consider missed fields in 'actual' JSON  
+  example: `expected {"x": 1, "y": 2} == actual {"x": 1}`
+
+
+- `Feature.IGNORE_NUMBERS_TYPE` - Do not consider is value 'float' or 'integer' and compare as is  
+  example: `expected {"x": 1.0} == actual {"x": 1}`
+
+
+- `Feature.IGNORE_STRING_CASE` - Do not consider case for string values  
+  example: `expected {"x": "HeLlO"} == actual {"x": "hello"}`
+
+
+- `Feature.CHECK_FIELDS_PRESENCE_ONLY` - Check only fields presence and ignore their values  
+  example: `expected {"x": 1"} == actual {"x": 2}`
 
 For turning on or off use method `feature()`:
 ```java
@@ -39,7 +53,7 @@ jsonDelta.feature(Feature.IGNORE_EXTRA_FIELDS, true);  // turn on
 jsonDelta.feature(Feature.IGNORE_EXTRA_FIELDS, false); // turn off
 ```
 ## Ignoring fields
-You can ignore any number of compared JSON fields via `vararg ignoredFields` parameter of `compare()` method.
+You can ignore any number of compared JSON fields via `vararg ignoredFields` parameter of `compare()` method.  
 There are two ways:
 - Using explicit field path `root.object.field` or `root.array[2].field` for arrays
 - Using **regex**, like this `root.array\[[1-3]\].\[[a,b]\]`

@@ -52,7 +52,13 @@ object Checks {
     fun areFieldsEqual(field: String, expected: JsonPrimitive, actual: JsonPrimitive, context: DeltaContext) {
         if (context.isFeatureUsed(Feature.CHECK_FIELDS_PRESENCE_ONLY))
             return
-        if (expected != actual)
+        val areEquals = when {
+            expected.isString && context.isFeatureUsed(Feature.IGNORE_STRING_CASE) ->
+                expected.toString().equals(actual.toString(), ignoreCase = true)
+            else ->
+                expected == actual
+        }
+        if (areEquals.not())
             context.addMismatch(ValueMismatch(field, MismatchType.VALUE_MISMATCH, expected.toString(), actual.toString()))
     }
 
