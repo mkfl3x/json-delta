@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.mkfl3x"
-version = "1.2"
+version = "1.3"
 
 repositories {
     mavenCentral()
@@ -68,12 +68,6 @@ signing {
         System.getenv("PGP_PASSPHRASE")
     )
     sign(publishing.publications)
-}
-
-tasks.jar {
-    manifest.attributes["Main-Class"] = "org.mkfl3x.jsondelta.JsonDelta"
-    from(configurations.compileClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.test {

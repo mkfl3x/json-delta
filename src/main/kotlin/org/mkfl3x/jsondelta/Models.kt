@@ -1,6 +1,6 @@
 package org.mkfl3x.jsondelta
 
-abstract class Mismatch {
+sealed class Mismatch {
 
     abstract val field: String
 
@@ -13,7 +13,6 @@ abstract class Mismatch {
         is StructureMismatch -> "$objectName ${type.description}."
         is ObjectMismatch -> "${type.description}. Fields: ${fields.joinToString()}"
         is ValueMismatch -> "${type.description}. Expected: $expected; Actual: $actual"
-        else -> throw Exception("Unexpected mismatch type")
     }
 }
 
