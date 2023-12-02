@@ -41,10 +41,10 @@ data class ArrayElementNotFoundMismatch(
     override val type: MismatchType
 ) : Mismatch()
 
-data class JsonDeltaReport(val success: Boolean, val mismatches: List<Mismatch>) {
+data class JsonDeltaReport(val equals: Boolean, val mismatches: List<Mismatch>) {
 
     override fun toString() = """
-    |Status: ${if (success) "success" else "failed"}
+    |Equals: $equals
     |${if (mismatches.isNotEmpty()) "Mismatches:" else ""}
     |${mismatches.joinToString("\n") { it.print() }}
     """.trimMargin()

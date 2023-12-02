@@ -95,12 +95,12 @@ jsonDelta.compare(expected, actual, "root.a", "root.c\\[[^1-3]\\]");
 ```
 ## Report:
 Method `compare()` returns  `JsonDeltaReport` object where you can find following fields:
-- **success** (`Boolean`): Comparison result (_success_ if JSONs are equals)
+- **equals** (`Boolean`): Comparison result (_true_ if JSONs are equals)
 - **mismatches** (`List<Mismatch>`): List of all mismatches
 
 And you can print it as string. Output example:
 ```text
-Status: failed
+Equals: false
 Mismatches:
 "root.a": Value mismatch. Expected: "ciao"; Actual: "hello"
 "root.b.z[3]": Type mismatch. Expected: integer; Actual: float

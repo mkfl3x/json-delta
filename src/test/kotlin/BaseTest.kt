@@ -5,12 +5,12 @@ import org.mkfl3x.jsondelta.Mismatch
 abstract class BaseTest {
 
     protected fun checkReportSuccess(report: JsonDeltaReport) {
-        assertTrue(report.success, "Unexpected report status")
+        assertTrue(report.equals, "Unexpected report status")
         checkMismatchesCount(report.mismatches.size, 0)
     }
 
     protected fun checkReportFailed(report: JsonDeltaReport) =
-        assertFalse(report.success, "Unexpected report status")
+        assertFalse(report.equals, "Unexpected report status")
 
     protected fun checkMismatchesPresence(report: JsonDeltaReport, vararg expectedMismatches: Mismatch) {
         checkMismatchesCount(report.mismatches.size, expectedMismatches.size)
