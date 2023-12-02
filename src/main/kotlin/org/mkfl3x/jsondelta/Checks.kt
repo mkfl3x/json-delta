@@ -62,6 +62,15 @@ object Checks {
             context.addMismatch(ValueMismatch(field, MismatchType.VALUE_MISMATCH, expected.toString(), actual.toString()))
     }
 
+    fun compareArraysIgnoringOrder(field: String, expected: JsonArray, actual: JsonArray, context: DeltaContext) {
+        expected.forEachIndexed { i, e ->
+            if (e in actual)
+                actual.remove(e)
+            else
+                context.addMismatch(ArrayElementNotFoundMismatch("$field[${i + 1}]", MismatchType.ARRAY_ELEMENT_NOT_FOUND))
+        }
+    }
+
     private fun getObjectType(value: JsonElement) = when {
         value.isJsonPrimitive -> getPrimitiveType(value.asJsonPrimitive)
         value.isJsonObject -> "object"

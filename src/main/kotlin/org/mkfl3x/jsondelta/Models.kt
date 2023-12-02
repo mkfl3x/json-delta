@@ -13,6 +13,7 @@ sealed class Mismatch {
         is StructureMismatch -> "$objectName ${type.description}."
         is ObjectMismatch -> "${type.description}. Fields: ${fields.joinToString()}"
         is ValueMismatch -> "${type.description}. Expected: $expected; Actual: $actual"
+        is ArrayElementNotFoundMismatch -> "${type.description}."
     }
 }
 
@@ -33,6 +34,11 @@ data class ValueMismatch(
     override val type: MismatchType,
     val expected: String,
     val actual: String
+) : Mismatch()
+
+data class ArrayElementNotFoundMismatch(
+    override val field: String,
+    override val type: MismatchType
 ) : Mismatch()
 
 data class JsonDeltaReport(val success: Boolean, val mismatches: List<Mismatch>) {
@@ -57,11 +63,14 @@ class DeltaContext(private val ignoredFields: List<String>, private val features
     fun getReport() = JsonDeltaReport(mismatches.isEmpty(), mismatches)
 }
 
+class IgnoreArrayIndexException(message: String) : Exception(message)
+
 enum class MismatchType(val description: String) {
     NOT_VALID_JSON("JSON object is not valid"),
     OBJECT_MISSED_FIELDS("Object doesn't contain expected fields"),
     OBJECT_EXTRA_FIELDS("Object contains unexpected fields"),
     ARRAY_SIZE_MISMATCH("Array size mismatch"),
+    ARRAY_ELEMENT_NOT_FOUND("Array element not found"),
     VALUE_MISMATCH("Value mismatch"),
     TYPE_MISMATCH("Type mismatch")
 }
@@ -71,5 +80,6 @@ enum class Feature {
     IGNORE_MISSED_FIELDS,
     IGNORE_NUMBERS_TYPE,
     IGNORE_STRING_CASE,
+    IGNORE_ARRAYS_ORDER,
     CHECK_FIELDS_PRESENCE_ONLY
 }

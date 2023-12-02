@@ -6,6 +6,7 @@ import org.mkfl3x.jsondelta.Checks.areFieldsEqual
 import org.mkfl3x.jsondelta.Checks.areFieldsMissed
 import org.mkfl3x.jsondelta.Checks.areFieldsUnexpected
 import org.mkfl3x.jsondelta.Checks.areTypesEqual
+import org.mkfl3x.jsondelta.Checks.compareArraysIgnoringOrder
 import org.mkfl3x.jsondelta.Checks.isJsonValid
 
 class JsonDelta {
@@ -35,6 +36,8 @@ class JsonDelta {
                 isJsonValid(expected, "expected", this),
                 isJsonValid(actual, "actual", this)
             ).let { if (it.any { x -> x.not() }) return@apply }
+            if (isFeatureUsed(Feature.IGNORE_ARRAYS_ORDER) && ignoredFields.any { it.contains("[") })
+                throw IgnoreArrayIndexException("Ignoring array indexes not available when ${Feature.IGNORE_ARRAYS_ORDER} feature is enabled")
             comparisonResolver("root", JsonParser.parseString(expected), JsonParser.parseString(actual), this)
         }.getReport()
 
@@ -53,7 +56,10 @@ class JsonDelta {
     private fun compareArrays(field: String, expected: JsonArray, actual: JsonArray, context: DeltaContext) {
         if (areArraysSizeMatch(field, expected, actual, context).not())
             return
-        expected.forEachIndexed { i, _ -> comparisonResolver("$field[${i + 1}]", expected[i], actual[i], context) }
+        if (context.isFeatureUsed(Feature.IGNORE_ARRAYS_ORDER))
+            compareArraysIgnoringOrder(field, expected, actual, context)
+        else
+            expected.forEachIndexed { i, _ -> comparisonResolver("$field[${i + 1}]", expected[i], actual[i], context) }
     }
 
     private fun compareObjects(field: String, expected: JsonObject, actual: JsonObject, context: DeltaContext) {

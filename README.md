@@ -47,6 +47,10 @@ You can customize `JsonDelta` instance with following features:
 - `Feature.CHECK_FIELDS_PRESENCE_ONLY` - Check only fields presence and ignore their values  
   example: `expected {"x": 1"} == actual {"x": 2}`
 
+
+- `Feature.IGNORE_ARRAYS_ORDER` - Do not consider array elements order   
+  example: `expected {"arr": [1, 2, 3]} == actual {"arr": [3, 2, 1]}`
+
 For turning on or off use method `feature()`:
 ```java
 jsonDelta.feature(Feature.IGNORE_EXTRA_FIELDS, true);  // turn on
@@ -61,6 +65,8 @@ There are two ways:
 > - '**root**' means the top level of JSON object or array
 > - all fields should be splitted by dots ( **.** )
 > - array indexes should be placed in square brackets ( **[ ]** )
+
+**<font color="red">Attention!</font>** Ignoring array indexes with turned on `Feature.IGNORE_ARRAYS_ORDER` will lead to throwing `IgnoreArrayIndexException`
 
 **Example**:
 ```java
