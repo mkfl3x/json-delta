@@ -66,7 +66,7 @@ There are two ways:
 > - all fields should be splitted by dots ( **.** )
 > - array indexes should be placed in square brackets ( **[ ]** )
 
-**<font color="red">Attention!</font>** Ignoring array indexes with turned on `Feature.IGNORE_ARRAYS_ORDER` will lead to throwing `IgnoreArrayIndexException`
+**${{\color{red}{\textsf{Attention!\}}}}\$** Ignoring array indexes with turned on `Feature.IGNORE_ARRAYS_ORDER` will lead to throwing `IgnoreArrayIndexException`
 
 **Example**:
 ```java
