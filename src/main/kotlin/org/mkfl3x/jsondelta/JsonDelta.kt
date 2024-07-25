@@ -36,7 +36,7 @@ class JsonDelta {
                 isJsonValid(expected, "expected", this),
                 isJsonValid(actual, "actual", this)
             ).let { if (it.any { x -> x.not() }) return@apply }
-            if (isFeatureUsed(Feature.IGNORE_ARRAYS_ORDER) && ignoredFields.any { it.contains("[") })
+            if (isFeatureUsed(Feature.IGNORE_ARRAYS_ORDER) && ignoredFields.any { "\\[.*]".toRegex().containsMatchIn(it) })
                 throw IgnoreArrayIndexException("Ignoring array indexes not available when ${Feature.IGNORE_ARRAYS_ORDER} feature is enabled")
             comparisonResolver("root", JsonParser.parseString(expected), JsonParser.parseString(actual), this)
         }.getReport()

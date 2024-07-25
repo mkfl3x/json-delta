@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.mkfl3x.jsondelta.*
 
@@ -64,10 +65,25 @@ class IgnoreArraysOrderTest : BaseTest() {
 
     @Test
     fun compareArrayWithIgnoringArrayIndex() {
-        assertThrows<IgnoreArrayIndexException> {
-            JsonDelta()
-                .feature(Feature.IGNORE_ARRAYS_ORDER, true)
-                .compare(expectedArrayJson, actualArrayJson, "root[1]")
-        }
+        JsonDelta()
+            .feature(Feature.IGNORE_ARRAYS_ORDER, true).apply {
+                assertAll(
+                    {
+                        assertThrows<IgnoreArrayIndexException> {
+                            compare(expectedArrayJson, actualArrayJson, "root[1]")
+                        }
+                    },
+                    {
+                        assertThrows<IgnoreArrayIndexException> {
+                            compare(expectedArrayJson, actualArrayJson, "root\\[[1,2]\\]")
+                        }
+                    },
+                    {
+                        assertThrows<IgnoreArrayIndexException> {
+                            compare(expectedArrayJson, actualArrayJson, "root\\[[1-3]\\]")
+                        }
+                    }
+                )
+            }
     }
 }
