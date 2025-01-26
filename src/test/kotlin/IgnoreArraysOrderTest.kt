@@ -84,6 +84,23 @@ class IgnoreArraysOrderTest : BaseTest() {
                         }
                     }
                 )
+                assertAll(
+                    {
+                        checkReportSuccess(
+                            compare(expectedArrayJson, actualArrayJson, "root[a,b]")
+                        )
+                    },
+                    {
+                        checkReportSuccess(
+                            compare(expectedArrayJson, actualArrayJson, "root[a]")
+                        )
+                    },
+                    {
+                        checkReportSuccess(
+                            compare(expectedArrayJson, actualArrayJson, "root[abc]")
+                        )
+                    }
+                )
             }
     }
 }
